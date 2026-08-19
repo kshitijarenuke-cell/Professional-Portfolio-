@@ -323,9 +323,9 @@ export const Achievements: React.FC = () => {
                     className="p-5 h-full group relative transition-all duration-300 hover:border-cyan-500/30 hover:shadow-[0_0_20px_rgba(0,210,255,0.08)] hover:-translate-y-[2px]"
                     id={`achievement-card-${cardKey}`}
                   >
-                    {/* Admin Action Buttons (Edit / Delete) */}
+                    {/* Admin Action Buttons (Edit / Delete) - visible only on card hover */}
                     {isAdmin && (
-                      <div className="absolute top-3 right-3 flex items-center gap-1.5 z-20">
+                      <div className="absolute top-3 right-3 flex items-center gap-1.5 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
