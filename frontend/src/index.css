@@ -1,0 +1,21 @@
+/* ─── Minimal global reset ─────────────────────────────────────────────────
+   portfolio.css owns ALL design tokens, layout, typography, and color.
+   This file must ONLY provide the bare-minimum browser reset.
+   Do NOT add any color, background, font-size, or layout rules here.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure #root never constrains layout — portfolio.css controls width/layout */
+#root {
+  width: 100%;
+  min-height: 100vh;
+}

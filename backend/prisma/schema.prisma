@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("admins")
+}
+
+model Project {
+  id           String   @id @default(cuid())
+  title        String
+  description  String
+  technologies String[]
+  githubUrl    String   @default("#")
+  liveUrl      String   @default("#")
+  imageUrl     String   @default("")
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("projects")
+}
+
+model TechStack {
+  id        String   @id @default(cuid())
+  name      String
+  category  String
+  icon      String   @default("fas fa-cubes")
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@map("tech_stack")
+}
+
+model About {
+  id           String   @id @default(cuid())
+  heading      String   @default("Your Name")
+  description  String   @default("")
+  profileImage String   @default("")
+  resumeUrl    String   @default("")
+  stats        Json     @default("[{\"label\": \"Experience\", \"value\": \"Fresh Graduate\"}, {\"label\": \"Projects\", \"value\": \"10+\"}, {\"label\": \"Skills\", \"value\": \"20+\"}]")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("about")
+}
+
+model Contact {
+  id        String   @id @default(cuid())
+  email     String   @default("")
+  phone     String   @default("")
+  location  String   @default("")
+  available Boolean  @default(true)
+  resumeUrl String   @default("")
+  socials   Json     @default("{\"github\": \"\", \"leetcode\": \"\", \"linkedin\": \"\", \"instagram\": \"\"}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("contact")
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("messages")
+}
+
+model Settings {
+  id          String @id @default(cuid())
+  projectView String @default("grid")
+
+  @@map("settings")
+}
