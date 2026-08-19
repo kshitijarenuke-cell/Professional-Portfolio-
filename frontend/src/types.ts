@@ -1,5 +1,6 @@
 export interface Project {
-  id: string;
+  _id?: string;
+  id?: string;
   title: string;
   description: string;
   technologies: string[];
@@ -10,7 +11,8 @@ export interface Project {
 }
 
 export interface TechItem {
-  id: string;
+  _id?: string;
+  id?: string;
   name: string;
   category: string; // 'Frontend' | 'Backend' | 'Database' | 'Languages' | 'Tools' | 'Deployment'
   icon: string;
@@ -23,6 +25,7 @@ export interface StatItem {
 }
 
 export interface AboutData {
+  _id?: string;
   id?: string;
   heading: string;
   description: string;
@@ -39,6 +42,7 @@ export interface SocialLinks {
 }
 
 export interface ContactData {
+  _id?: string;
   id?: string;
   email: string;
   phone: string;
@@ -49,7 +53,8 @@ export interface ContactData {
 }
 
 export interface MessageData {
-  id: string;
+  _id?: string;
+  id?: string;
   name: string;
   email: string;
   subject: string;

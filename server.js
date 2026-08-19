@@ -385,7 +385,7 @@ app.post('/api/upload', authMiddleware, uploadMiddleware.single('file'), async (
    SETTINGS PREFERENCE ENDPOINTS
    ========================================================================== */
 
-app.get('/api/settings', async (req, res) => {
+app.get(['/api/settings', '/api/admin/settings'], async (req, res) => {
   try {
     let settings = await Settings.findOne();
     if (!settings) {
@@ -398,7 +398,7 @@ app.get('/api/settings', async (req, res) => {
   }
 });
 
-app.put('/api/settings', async (req, res) => {
+app.put(['/api/settings', '/api/admin/settings'], async (req, res) => {
   try {
     let settings = await Settings.findOne();
     if (!settings) settings = new Settings();

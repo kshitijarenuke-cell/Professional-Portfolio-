@@ -20,7 +20,7 @@ export const Projects: React.FC = () => {
 
   const fetchSettings = async () => {
     try {
-      const res = await api.get<{ projectView?: 'grid' | 'list' }>('/admin/settings');
+      const res = await api.get<{ projectView?: 'grid' | 'list' }>('/settings');
       if (res.data?.projectView) setViewLayout(res.data.projectView);
     } catch (e) {
       // ignore
@@ -42,7 +42,7 @@ export const Projects: React.FC = () => {
           githubUrl: '#',
           liveUrl: '#',
         });
-        if (res.data.success) {
+        if (res.data.success && res.data.data) {
           setProjects((prev) => [...prev, res.data.data]);
           showToast('✓ New project created');
         } else {
@@ -58,7 +58,7 @@ export const Projects: React.FC = () => {
     setViewLayout(layout);
     if (isAdmin) {
       try {
-        await api.put('/admin/settings', { projectView: layout });
+        await api.put('/settings', { projectView: layout });
       } catch (e) {
         // ignore
       }
@@ -66,11 +66,17 @@ export const Projects: React.FC = () => {
   };
 
   const handleUpdateProject = (updated: Project) => {
-    setProjects((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
+    const targetId = updated._id || updated.id;
+    setProjects((prev) =>
+      prev.map((p) => {
+        const pId = p._id || p.id;
+        return pId === targetId ? updated : p;
+      })
+    );
   };
 
   const handleDeleteProject = (id: string) => {
-    setProjects((prev) => prev.filter((p) => p.id !== id));
+    setProjects((prev) => prev.filter((p) => (p._id || p.id) !== id));
   };
 
   return (
@@ -150,9 +156,9 @@ export const Projects: React.FC = () => {
       {/* Grid Container */}
       <div className="sp-layout-wrapper">
         <div className={`sp-grid ${viewLayout === 'list' ? 'list-layout' : ''}`}>
-          {projects.map((project) => (
+          {projects.map((project, idx) => (
             <ProjectCard
-              key={project.id}
+              key={project._id || project.id || idx}
               project={project}
               onUpdate={handleUpdateProject}
               onDelete={handleDeleteProject}

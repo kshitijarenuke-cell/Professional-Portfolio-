@@ -12,7 +12,7 @@ interface ProjectCardProps {
 export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onDelete }) => {
   const { triggerAdminAction, showToast } = useAuth();
   // MongoDB returns _id; fall back gracefully so we never hit /api/projects/undefined
-  const projectId = (project as any)._id ?? project.id;
+  const projectId = project._id || project.id;
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -30,6 +30,15 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onD
 
   const handleEditClick = () => {
     triggerAdminAction(() => {
+      setTitle(project.title);
+      setDescription(project.description);
+      setTechnologies(project.technologies ? [...project.technologies] : []);
+      setGithubUrl(project.githubUrl || '');
+      setLiveUrl(project.liveUrl || '');
+      setImageUrl(project.imageUrl || '');
+      setImageFile(null);
+      setImagePreview(project.imageUrl || '');
+      setTechInput('');
       setIsEditing(true);
     });
   };
@@ -44,12 +53,13 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onD
     setIsEditing(false);
     setTitle(project.title);
     setDescription(project.description);
-    setTechnologies(project.technologies || []);
+    setTechnologies(project.technologies ? [...project.technologies] : []);
     setGithubUrl(project.githubUrl || '');
     setLiveUrl(project.liveUrl || '');
     setImageUrl(project.imageUrl || '');
     setImageFile(null);
     setImagePreview(project.imageUrl || '');
+    setTechInput('');
   };
 
   const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,6 +97,11 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onD
       return;
     }
 
+    if (!projectId) {
+      showToast('✗ Project ID missing');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       let finalImg = imageUrl;
@@ -105,9 +120,10 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onD
       };
 
       const res = await api.put<{ success: boolean; data: Project }>(`/projects/${projectId}`, payload);
-      if (res.data.success) {
+      if (res.data.success && res.data.data) {
         onUpdate(res.data.data);
         setIsEditing(false);
+        setImageFile(null);
         showToast('✓ Project updated successfully');
       } else {
         showToast('✗ Update failed');
@@ -121,6 +137,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onD
   };
 
   const handleConfirmDelete = async () => {
+    if (!projectId) return;
     try {
       const res = await api.delete<{ success: boolean }>(`/projects/${projectId}`);
       if (res.data.success) {
@@ -139,10 +156,10 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onD
     <div className={`sp-card ${isEditing ? 'editing' : ''}`} data-id={projectId}>
       {/* Single Project Image Area */}
       <div className="sp-card-img-wrap relative group/img">
-        {imagePreview ? (
+        {(isEditing ? imagePreview : project.imageUrl) ? (
           <img
-            src={imagePreview}
-            alt={title}
+            src={isEditing ? imagePreview : project.imageUrl}
+            alt={project.title}
             style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '22px 22px 0 0', display: 'block' }}
           />
         ) : (

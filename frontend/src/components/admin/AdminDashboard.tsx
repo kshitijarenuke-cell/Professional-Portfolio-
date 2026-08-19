@@ -187,7 +187,7 @@ export const AdminDashboard: React.FC = () => {
     try {
       const res = await api.delete<{ success: boolean }>(`/techstack/${id}`);
       if (res.data.success) {
-        setTechList((prev) => prev.filter((t) => t.id !== id));
+        setTechList((prev) => prev.filter((t) => (t._id || t.id) !== id));
         showToast('✓ Skill deleted');
       }
     } catch (e) {
@@ -428,21 +428,24 @@ export const AdminDashboard: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              {techList.map((tech) => (
-                <div key={tech.id} className="flex items-center justify-between p-3 rounded-xl border border-white/10 bg-white/5 text-xs">
-                  <div className="flex items-center gap-2">
-                    <i className={`${tech.icon} text-cyan-400`}></i>
-                    <span className="font-bold text-white">{tech.name}</span>
-                    <span className="text-[10px] text-gray-500 uppercase">({tech.category})</span>
+              {techList.map((tech, idx) => {
+                const techId = tech._id || tech.id || String(idx);
+                return (
+                  <div key={techId} className="flex items-center justify-between p-3 rounded-xl border border-white/10 bg-white/5 text-xs">
+                    <div className="flex items-center gap-2">
+                      <i className={`${tech.icon} text-cyan-400`}></i>
+                      <span className="font-bold text-white">{tech.name}</span>
+                      <span className="text-[10px] text-gray-500 uppercase">({tech.category})</span>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteTechFromDash(techId)}
+                      className="text-red-400 hover:text-red-500 bg-transparent border-0 cursor-pointer"
+                    >
+                      <i className="fas fa-trash"></i>
+                    </button>
                   </div>
-                  <button
-                    onClick={() => handleDeleteTechFromDash(tech.id)}
-                    className="text-red-400 hover:text-red-500 bg-transparent border-0 cursor-pointer"
-                  >
-                    <i className="fas fa-trash"></i>
-                  </button>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
@@ -526,8 +529,8 @@ export const AdminDashboard: React.FC = () => {
           <div className="space-y-6">
             <h3 className="text-xl font-bold text-white font-sora">Contact Form Messages</h3>
             <div className="space-y-3">
-              {messages.map((msg) => (
-                <div key={msg.id} className="p-4 rounded-xl border border-white/10 bg-white/5 space-y-2">
+              {messages.map((msg, idx) => (
+                <div key={msg._id || msg.id || idx} className="p-4 rounded-xl border border-white/10 bg-white/5 space-y-2">
                   <div className="flex justify-between items-center">
                     <h4 className="text-xs font-bold text-white">
                       {msg.name} ({msg.email})
@@ -548,8 +551,8 @@ export const AdminDashboard: React.FC = () => {
           <div className="space-y-6">
             <h3 className="text-xl font-bold text-white font-sora">Projects Directory</h3>
             <div className="space-y-3">
-              {projects.map((p) => (
-                <div key={p.id} className="flex items-center justify-between p-4 rounded-xl border border-white/10 bg-white/5">
+              {projects.map((p, idx) => (
+                <div key={p._id || p.id || idx} className="flex items-center justify-between p-4 rounded-xl border border-white/10 bg-white/5">
                   <div>
                     <h4 className="text-sm font-bold text-white">{p.title}</h4>
                     <p className="text-xs text-gray-400 mt-1 max-w-md truncate">{p.description}</p>
