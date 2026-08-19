@@ -64,8 +64,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string) => {
     try {
-      const res = await api.post<{ success: boolean; message?: string }>('/auth/login', { email, password });
+      const res = await api.post<{ success: boolean; message?: string; token?: string }>('/auth/login', { email, password });
       if (res.data.success) {
+        if (res.data.token) {
+          localStorage.setItem('portfolio_admin_token', res.data.token);
+        }
         setIsAdmin(true);
         setIsLoginModalOpen(false);
         showToast('✓ Login successful');
@@ -96,6 +99,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (e) {
       console.error(e);
     } finally {
+      localStorage.removeItem('portfolio_admin_token');
       setIsAdmin(false);
       setIsDashboardOpen(false);
       showToast('✓ Logged out successfully');

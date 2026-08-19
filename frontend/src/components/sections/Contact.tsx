@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { api } from '../../api/client';
+import { api, resolveBackendAssetUrl } from '../../api/client';
 import type { ContactData } from '../../types';
 
 export const Contact: React.FC = () => {
@@ -270,7 +270,7 @@ export const Contact: React.FC = () => {
             <div>
               <div>
                 <a
-                  href={contact?.resumeUrl || '/uploads/Resume.pdf'}
+                  href={resolveBackendAssetUrl(contact?.resumeUrl || '/uploads/Resume.pdf')}
                   download="Resume.pdf"
                   target="_blank"
                   rel="noreferrer"

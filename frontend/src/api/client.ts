@@ -17,6 +17,35 @@ export const api = axios.create({
   },
 });
 
+// Attach Authorization Bearer token from localStorage for reliable cross-origin authentication
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('portfolio_admin_token');
+  if (token && config.headers) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Helper to resolve backend-served assets (like /uploads/...) to full backend URLs in production
+export const resolveBackendAssetUrl = (url?: string): string => {
+  if (!url) return '';
+  if (
+    url.startsWith('http://') ||
+    url.startsWith('https://') ||
+    url.startsWith('data:') ||
+    url.startsWith('blob:')
+  ) {
+    return url;
+  }
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl) {
+    const cleanBase = envUrl.replace(/\/+$/, '').replace(/\/api$/, '');
+    const cleanPath = url.startsWith('/') ? url : `/${url}`;
+    return `${cleanBase}${cleanPath}`;
+  }
+  return url;
+};
+
 // Helper for file uploads
 export const uploadFile = async (file: File): Promise<string | null> => {
   const formData = new FormData();
@@ -33,4 +62,3 @@ export const uploadFile = async (file: File): Promise<string | null> => {
     return null;
   }
 };
-

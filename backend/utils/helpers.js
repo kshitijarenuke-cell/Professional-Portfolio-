@@ -10,21 +10,34 @@ const isResendMock = resendKey === 're_1234567890' || !resendKey.startsWith('re_
 const resendInstance = isResendMock ? null : new Resend(resendKey);
 
 // Initialize Cloudinary
-const isCloudinaryMock = 
-  !process.env.CLOUDINARY_CLOUD_NAME || 
-  process.env.CLOUDINARY_CLOUD_NAME === 'demo' ||
-  !process.env.CLOUDINARY_API_KEY ||
-  process.env.CLOUDINARY_API_KEY.includes('12345');
+const isCloudinaryConfigured = Boolean(
+  process.env.CLOUDINARY_CLOUD_NAME &&
+  process.env.CLOUDINARY_CLOUD_NAME !== 'demo' &&
+  process.env.CLOUDINARY_CLOUD_NAME !== 'your_cloudinary_cloud_name' &&
+  process.env.CLOUDINARY_CLOUD_NAME !== 'your_cloud_name' &&
+  process.env.CLOUDINARY_API_KEY &&
+  !process.env.CLOUDINARY_API_KEY.includes('12345') &&
+  process.env.CLOUDINARY_API_KEY !== 'your_cloudinary_api_key' &&
+  process.env.CLOUDINARY_API_KEY !== 'your_api_key' &&
+  process.env.CLOUDINARY_API_SECRET &&
+  process.env.CLOUDINARY_API_SECRET !== 'your_cloudinary_api_secret' &&
+  process.env.CLOUDINARY_API_SECRET !== 'your_api_secret'
+);
 
-if (!isCloudinaryMock) {
+const isCloudinaryMock = !isCloudinaryConfigured;
+
+if (isCloudinaryConfigured) {
   cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET
   });
+  console.log(`[Cloudinary] Initialized with cloud: ${process.env.CLOUDINARY_CLOUD_NAME}`);
+} else {
+  console.log('[Cloudinary] Running in local development fallback mode (Cloudinary keys unconfigured)');
 }
 
-// Multer Setup (Local Disk Fallback + Cloudinary Upload Helper)
+// Multer Setup (Local Disk Fallback + Cloudinary Memory Storage Helper)
 const localUploadsDir = path.join(__dirname, '../../uploads');
 if (!fs.existsSync(localUploadsDir)) {
   fs.mkdirSync(localUploadsDir, { recursive: true });
@@ -41,25 +54,38 @@ const localDiskStorage = multer.diskStorage({
   }
 });
 
-// Multer parser configured to memory storage if using Cloudinary, or disk storage if local fallback
+// Multer parser configured to memory storage when using Cloudinary or in production
 const uploadMiddleware = multer({
-  storage: isCloudinaryMock ? localDiskStorage : multer.memoryStorage(),
+  storage: (isCloudinaryConfigured || process.env.NODE_ENV === 'production') ? multer.memoryStorage() : localDiskStorage,
   limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
 });
 
 /**
  * Uploads a file (either from buffer or local path) to Cloudinary
- * Falls back to local URL if Cloudinary is not configured
+ * In production: throws an error if Cloudinary is not configured or fails.
+ * In development: falls back to local disk URL only if Cloudinary is not configured.
  */
 async function uploadToCloud(fileReq) {
-  if (isCloudinaryMock) {
-    // Return local URL
-    const relativePath = `/uploads/${fileReq.filename}`;
-    console.log(`[Upload Fallback] Saved file locally: ${relativePath}`);
-    return relativePath;
+  if (!fileReq) {
+    throw new Error('No file provided for upload.');
   }
 
-  // Upload to Cloudinary from memory buffer
+  // In production, Cloudinary credentials are required
+  if (process.env.NODE_ENV === 'production' && !isCloudinaryConfigured) {
+    throw new Error('Cloudinary credentials (CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET) are missing or invalid in Render Environment settings.');
+  }
+
+  // If Cloudinary is not configured and running locally, use disk fallback
+  if (!isCloudinaryConfigured) {
+    if (fileReq.filename) {
+      const relativePath = `/uploads/${fileReq.filename}`;
+      console.log(`[Upload Dev Fallback] Saved file locally: ${relativePath}`);
+      return relativePath;
+    }
+    throw new Error('Cloudinary is not configured in local environment.');
+  }
+
+  // Upload to Cloudinary from memory buffer or file stream
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       {
@@ -69,13 +95,23 @@ async function uploadToCloud(fileReq) {
       (error, result) => {
         if (error) {
           console.error('[Cloudinary Upload Error]', error);
-          reject(error);
+          reject(new Error(error.message || 'Cloudinary upload failed'));
+        } else if (!result || !result.secure_url) {
+          reject(new Error('Cloudinary did not return a secure URL'));
         } else {
+          console.log(`[Cloudinary Upload Success] URL: ${result.secure_url}`);
           resolve(result.secure_url);
         }
       }
     );
-    uploadStream.end(fileReq.buffer);
+
+    if (fileReq.buffer) {
+      uploadStream.end(fileReq.buffer);
+    } else if (fileReq.path && fs.existsSync(fileReq.path)) {
+      fs.createReadStream(fileReq.path).pipe(uploadStream);
+    } else {
+      reject(new Error('No valid file buffer or file path available for Cloudinary upload'));
+    }
   });
 }
 

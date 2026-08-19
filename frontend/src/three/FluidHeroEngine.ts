@@ -74,7 +74,8 @@ export class FluidHeroEngine {
   private scrollProgress: number = 0;
   private theme: Theme = 'dark';
   private animationFrameId: number | null = null;
-  private clock = new THREE.Clock();
+  private startTime = performance.now();
+  private lastTime = performance.now();
   private isDestroyed = false;
 
   constructor(container: HTMLElement, theme: Theme = 'dark') {
@@ -656,8 +657,10 @@ export class FluidHeroEngine {
     if (this.isDestroyed) return;
     this.animationFrameId = requestAnimationFrame(this.animate);
 
-    const delta = Math.min(this.clock.getDelta(), 0.05);
-    const time = this.clock.getElapsedTime();
+    const now = performance.now();
+    const delta = Math.min((now - this.lastTime) / 1000, 0.05);
+    this.lastTime = now;
+    const time = (now - this.startTime) / 1000;
 
     // 1. Smooth Mouse Cursor Lerp (Fluid head physics)
     const lerpSpeed = 0.12;

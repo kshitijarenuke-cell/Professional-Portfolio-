@@ -14,6 +14,7 @@ import { AdminLoginModal } from './components/admin/AdminLoginModal';
 import { AdminDashboard } from './components/admin/AdminDashboard';
 import { CanvasBackground } from './components/three/CanvasBackground';
 import { Navbar } from './components/Navbar';
+import { resolveBackendAssetUrl } from './api/client';
 import type { SectionId, Theme } from './types';
 import './portfolio.css';
 
@@ -105,7 +106,7 @@ export const App: React.FC = () => {
         onToggleTheme={() => setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'))}
         scrollPercent={scrollPercent}
         onOpenResume={() => {
-          window.open('/uploads/Resume.pdf', '_blank');
+          window.open(resolveBackendAssetUrl('/uploads/Resume.pdf'), '_blank');
         }}
       />
 

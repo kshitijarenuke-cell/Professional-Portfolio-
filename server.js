@@ -401,12 +401,11 @@ app.post('/api/upload', authMiddleware, uploadMiddleware.single('file'), async (
       return res.status(400).json({ success: false, message: 'No file uploaded' });
     }
 
-    // Call Cloudinary upload helper (falls back to local filesystem if mock config)
     const fileUrl = await uploadToCloud(req.file);
     res.json({ success: true, url: fileUrl });
   } catch (error) {
     console.error('[Upload Error]', error);
-    res.status(500).json({ success: false, message: 'Upload failed' });
+    res.status(500).json({ success: false, message: error.message || 'Upload failed' });
   }
 });
 

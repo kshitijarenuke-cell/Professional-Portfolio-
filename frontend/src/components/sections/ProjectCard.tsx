@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { api, uploadFile } from '../../api/client';
+import { api, uploadFile, resolveBackendAssetUrl } from '../../api/client';
 import type { Project } from '../../types';
 
 interface ProjectCardProps {
@@ -158,7 +158,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onD
       <div className="sp-card-img-wrap relative group/img">
         {(isEditing ? imagePreview : project.imageUrl) ? (
           <img
-            src={isEditing ? imagePreview : project.imageUrl}
+            src={resolveBackendAssetUrl(isEditing ? imagePreview : project.imageUrl)}
             alt={project.title}
             style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '22px 22px 0 0', display: 'block' }}
           />
