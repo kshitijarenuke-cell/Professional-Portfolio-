@@ -99,7 +99,8 @@ export interface Milestone {
 }
 
 export interface Achievement {
-  id: string;
+  _id?: string;
+  id?: string;
   title: string;
   issuer: string;
   date: string;
@@ -109,6 +110,22 @@ export interface Achievement {
   credentialId?: string;
   verifyUrl?: string;
   imageUrl?: string;
+  order?: number;
+}
+
+export interface Credential {
+  _id?: string;
+  id?: string;
+  title: string;
+  issuer: string;
+  date: string;
+  category: 'certification' | 'award' | 'hackathon';
+  description: string;
+  skills: string[];
+  credentialId?: string;
+  verifyUrl?: string;
+  imageUrl?: string;
+  order?: number;
 }
 
 export interface Repository {

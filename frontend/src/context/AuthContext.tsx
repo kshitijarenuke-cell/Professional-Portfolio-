@@ -53,6 +53,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // NO hidden keyboard shortcuts (Ctrl+Shift+A/L removed)
   }, []);
 
+  // Sync body.admin-mode class so CSS-driven admin controls (sp-card-actions etc.) activate
+  useEffect(() => {
+    if (isAdmin) {
+      document.body.classList.add('admin-mode');
+    } else {
+      document.body.classList.remove('admin-mode');
+    }
+  }, [isAdmin]);
+
   const triggerAdminAction = (actionFn: () => void) => {
     if (isAdmin) {
       actionFn();

@@ -112,6 +112,7 @@ const About = require('./backend/models/About');
 const Contact = require('./backend/models/Contact');
 const Message = require('./backend/models/Message');
 const Settings = require('./backend/models/Settings');
+const Credential = require('./backend/models/Credential');
 
 // Middleware & Utilities imports
 const authMiddleware = require('./backend/middleware/auth');
@@ -410,6 +411,62 @@ app.post('/api/upload', authMiddleware, uploadMiddleware.single('file'), async (
 });
 
 /* ==========================================================================
+   CREDENTIALS ROUTES
+   ========================================================================== */
+
+// GET all credentials (public)
+app.get('/api/credentials', async (req, res) => {
+  try {
+    const credentials = await Credential.find().sort({ order: 1, createdAt: 1 });
+    res.json(credentials);
+  } catch (error) {
+    console.error('[Credentials GET Error]', error);
+    res.status(500).json({ success: false, message: 'Server Error' });
+  }
+});
+
+// POST create credential (protected)
+app.post('/api/credentials', authMiddleware, async (req, res) => {
+  try {
+    const count = await Credential.countDocuments();
+    const newCred = new Credential({ ...req.body, order: count });
+    await newCred.save();
+    res.json({ success: true, data: newCred });
+  } catch (error) {
+    console.error('[Credentials POST Error]', error);
+    res.status(500).json({ success: false, message: error.message || 'Server Error' });
+  }
+});
+
+// PUT update credential by _id (protected)
+app.put('/api/credentials/:id', authMiddleware, async (req, res) => {
+  try {
+    const cred = await Credential.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+    if (!cred) return res.status(404).json({ success: false, message: 'Credential not found' });
+    res.json({ success: true, data: cred });
+  } catch (error) {
+    console.error('[Credentials PUT Error]', error);
+    res.status(500).json({ success: false, message: error.message || 'Server Error' });
+  }
+});
+
+// DELETE credential by _id (protected)
+app.delete('/api/credentials/:id', authMiddleware, async (req, res) => {
+  try {
+    const cred = await Credential.findByIdAndDelete(req.params.id);
+    if (!cred) return res.status(404).json({ success: false, message: 'Credential not found' });
+    res.json({ success: true, message: 'Credential deleted' });
+  } catch (error) {
+    console.error('[Credentials DELETE Error]', error);
+    res.status(500).json({ success: false, message: error.message || 'Server Error' });
+  }
+});
+
+/* ==========================================================================
    SETTINGS PREFERENCE ENDPOINTS
    ========================================================================== */
 
@@ -669,6 +726,63 @@ async function seedDatabase() {
       ];
       await Project.insertMany(defaultProjects);
       console.log('[Seed] Created default Projects list');
+    }
+
+    // 6. Seed Credentials (only if collection is empty)
+    const credCount = await Credential.countDocuments();
+    if (credCount === 0) {
+      const defaultCredentials = [
+        {
+          title: 'AWS Certified Cloud Foundations',
+          issuer: 'Amazon Web Services (AWS)',
+          date: '2024',
+          category: 'certification',
+          description: 'Validated foundational knowledge of AWS Cloud infrastructure, security models, compute services (EC2, Lambda), storage (S3), and networking fundamentals.',
+          skills: ['Cloud Computing', 'AWS S3', 'AWS Lambda', 'IAM Security', 'Cloud Architecture'],
+          credentialId: 'AWS-CF-VALIDATED',
+          verifyUrl: 'https://aws.amazon.com/verification',
+          imageUrl: '/aws_cert.jpg',
+          order: 0
+        },
+        {
+          title: 'Generative AI & LLM Systems Specialization',
+          issuer: 'DeepLearning.AI',
+          date: '2025',
+          category: 'certification',
+          description: 'Completed comprehensive training on prompt engineering, Retrieval-Augmented Generation (RAG), vector databases, and API integration with modern LLM models.',
+          skills: ['Prompt Engineering', 'RAG Pipelines', 'Vector Databases', 'Python', 'AI Integration'],
+          credentialId: 'DLAI-GENAI-SPECIALIST',
+          verifyUrl: 'https://www.deeplearning.ai',
+          imageUrl: '/ai_cert.jpg',
+          order: 1
+        },
+        {
+          title: 'Inter-Collegiate Hackathon Finalist',
+          issuer: 'Smart Tech Innovation Sprint',
+          date: '2024',
+          category: 'hackathon',
+          description: 'Selected as top finalist for architecting and presenting the Dynamic Toll Pricing prototype in a 36-hour continuous software development sprint.',
+          skills: ['Rapid Prototyping', 'Dynamic Algorithms', 'Team Collaboration', 'Technical Pitching'],
+          credentialId: 'SPRINT-FINALIST-2024',
+          verifyUrl: '',
+          imageUrl: '/hackathon_cert.jpg',
+          order: 2
+        },
+        {
+          title: 'Academic Excellence in Computer Engineering',
+          issuer: 'State Board of Technical Education',
+          date: '2023',
+          category: 'award',
+          description: 'Awarded Distinction honors for standing in the top 5% of the graduating Computer Engineering diploma cohort with consistent top-tier grades.',
+          skills: ['Data Structures', 'Database Management', 'Object-Oriented Programming', 'Computer Networks'],
+          credentialId: '',
+          verifyUrl: '',
+          imageUrl: '/academic_cert.jpg',
+          order: 3
+        }
+      ];
+      await Credential.insertMany(defaultCredentials);
+      console.log('[Seed] Created default Credentials list (4 cards)');
     }
   } catch (error) {
     console.error('[Seed Error]', error);
