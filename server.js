@@ -54,7 +54,7 @@ const messageLimiter = rateLimit({
 
 // Setup Middlewares
 // In production, restrict CORS to the deployed frontend URL (CLIENT_URL).
-// In development, allow all origins so local Vite dev server works seamlessly.
+// In development, allow all origins so local Vite dev er works seamlessly.
 const allowedOrigin = process.env.NODE_ENV === 'production'
   ? process.env.CLIENT_URL
   : true;
@@ -96,9 +96,9 @@ const Settings = require('./backend/models/Settings');
 const authMiddleware = require('./backend/middleware/auth');
 const { uploadMiddleware, uploadToCloud, sendNotificationEmail, isCloudinaryMock } = require('./backend/utils/helpers');
 
-// Static folders serving
+// Static folders ing
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-// Serve static client assets
+// e static client assets
 app.use(express.static(__dirname));
 
 /* ==========================================================================
@@ -132,7 +132,7 @@ app.post('/api/auth/login', loginLimiter, async (req, res) => {
     res.json({ success: true, message: 'Login successful' });
   } catch (error) {
     console.error('[Login Error]', error);
-    res.status(500).json({ success: false, message: 'Internal Server Error' });
+    res.status(500).json({ success: false, message: 'Internal er Error' });
   }
 });
 
@@ -177,7 +177,7 @@ app.get('/api/admin/stats', authMiddleware, async (req, res) => {
     });
   } catch (error) {
     console.error('[Admin Stats Error]', error);
-    res.status(500).json({ success: false, message: 'Server Error' });
+    res.status(500).json({ success: false, message: 'er Error' });
   }
 });
 
@@ -193,7 +193,7 @@ app.get('/api/about', async (req, res) => {
     }
     res.json(about);
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server Error' });
+    res.status(500).json({ success: false, message: 'er Error' });
   }
 });
 
@@ -206,7 +206,7 @@ app.put('/api/about', authMiddleware, async (req, res) => {
     await about.save();
     res.json({ success: true, data: about });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server Error' });
+    res.status(500).json({ success: false, message: 'er Error' });
   }
 });
 
@@ -219,7 +219,7 @@ app.get('/api/contact', async (req, res) => {
     const contact = await Contact.findOne();
     res.json(contact);
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server Error' });
+    res.status(500).json({ success: false, message: 'er Error' });
   }
 });
 
@@ -232,7 +232,7 @@ app.put('/api/contact', authMiddleware, async (req, res) => {
     await contact.save();
     res.json({ success: true, data: contact });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server Error' });
+    res.status(500).json({ success: false, message: 'er Error' });
   }
 });
 
@@ -245,7 +245,7 @@ app.get('/api/projects', async (req, res) => {
     const projects = await Project.find().sort({ order: 1 });
     res.json(projects);
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server Error' });
+    res.status(500).json({ success: false, message: 'er Error' });
   }
 });
 
@@ -259,7 +259,7 @@ app.post('/api/projects', authMiddleware, async (req, res) => {
     await newProject.save();
     res.json({ success: true, data: newProject });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server Error' });
+    res.status(500).json({ success: false, message: 'er Error' });
   }
 });
 
@@ -269,7 +269,7 @@ app.put('/api/projects/:id', authMiddleware, async (req, res) => {
     if (!project) return res.status(404).json({ success: false, message: 'Project not found' });
     res.json({ success: true, data: project });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server Error' });
+    res.status(500).json({ success: false, message: 'er Error' });
   }
 });
 
@@ -279,7 +279,7 @@ app.delete('/api/projects/:id', authMiddleware, async (req, res) => {
     if (!project) return res.status(444).json({ success: false, message: 'Project not found' });
     res.json({ success: true, message: 'Project deleted' });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server Error' });
+    res.status(500).json({ success: false, message: 'er Error' });
   }
 });
 
@@ -292,7 +292,7 @@ app.get('/api/techstack', async (req, res) => {
     const list = await TechStack.find().sort({ order: 1 });
     res.json(list);
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server Error' });
+    res.status(500).json({ success: false, message: 'er Error' });
   }
 });
 
@@ -306,7 +306,7 @@ app.post('/api/techstack', authMiddleware, async (req, res) => {
     await item.save();
     res.json({ success: true, data: item });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server Error' });
+    res.status(500).json({ success: false, message: 'er Error' });
   }
 });
 
@@ -315,7 +315,7 @@ app.put('/api/techstack/:id', authMiddleware, async (req, res) => {
     const item = await TechStack.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json({ success: true, data: item });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server Error' });
+    res.status(500).json({ success: false, message: 'er Error' });
   }
 });
 
@@ -324,7 +324,7 @@ app.delete('/api/techstack/:id', authMiddleware, async (req, res) => {
     await TechStack.findByIdAndDelete(req.params.id);
     res.json({ success: true, message: 'Skill deleted' });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server Error' });
+    res.status(500).json({ success: false, message: 'er Error' });
   }
 });
 
@@ -349,7 +349,7 @@ app.post('/api/messages', messageLimiter, async (req, res) => {
     res.json({ success: true, message: 'Message sent successfully!' });
   } catch (error) {
     console.error('[Contact Form Error]', error);
-    res.status(500).json({ success: false, message: 'Server Error' });
+    res.status(500).json({ success: false, message: 'er Error' });
   }
 });
 
@@ -358,7 +358,7 @@ app.get('/api/messages', authMiddleware, async (req, res) => {
     const list = await Message.find().sort({ createdAt: -1 });
     res.json(list);
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server Error' });
+    res.status(500).json({ success: false, message: 'er Error' });
   }
 });
 
@@ -394,7 +394,7 @@ app.get(['/api/settings', '/api/admin/settings'], async (req, res) => {
     }
     res.json(settings);
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server Error' });
+    res.status(500).json({ success: false, message: 'er Error' });
   }
 });
 
@@ -406,7 +406,7 @@ app.put(['/api/settings', '/api/admin/settings'], async (req, res) => {
     await settings.save();
     res.json({ success: true, data: settings });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server Error' });
+    res.status(500).json({ success: false, message: 'er Error' });
   }
 });
 
@@ -482,9 +482,9 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Launch Server
+// Launch er
 app.listen(PORT, () => {
-  console.log(`[Server] Listening on http://localhost:${PORT}`);
+  console.log(`[er] Listening on http://localhost:${PORT}`);
 });
 
 /* ==========================================================================
@@ -599,7 +599,7 @@ async function seedDatabase() {
         { category: 'Frontend', name: 'React', icon: 'fab fa-react text-[#61DAFB]', order: 3 },
         { category: 'Frontend', name: 'Tailwind CSS', icon: 'fab fa-css3-alt text-[#38BDF8]', order: 4 },
         { category: 'Backend', name: 'Node.js', icon: 'fab fa-node-js text-[#339933]', order: 5 },
-        { category: 'Backend', name: 'Express.js', icon: 'fas fa-server text-gray-400', order: 6 },
+        { category: 'Backend', name: 'Express.js', icon: 'fas fa-er text-gray-400', order: 6 },
         { category: 'Database', name: 'MongoDB', icon: 'fas fa-database text-[#47A248]', order: 7 },
         { category: 'Tools', name: 'Git', icon: 'fab fa-git-alt text-[#F05032]', order: 8 }
       ];
