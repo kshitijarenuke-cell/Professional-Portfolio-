@@ -53,11 +53,32 @@ const messageLimiter = rateLimit({
 });
 
 // Setup Middlewares
-// In production, restrict CORS to the deployed frontend URL (CLIENT_URL).
-// In development, allow all origins so local Vite dev er works seamlessly.
-const allowedOrigin = process.env.NODE_ENV === 'production'
-  ? process.env.CLIENT_URL
-  : true;
+// In production, allow configured CLIENT_URL, Render/Vercel/Netlify preview domains, and localhost
+const allowedOrigin = (origin, callback) => {
+  if (!origin) return callback(null, true);
+  if (process.env.NODE_ENV !== 'production') return callback(null, true);
+
+  if (process.env.CLIENT_URL) {
+    const origins = process.env.CLIENT_URL.split(',').map((o) => o.trim().replace(/\/+$/, ''));
+    if (origins.includes(origin.replace(/\/+$/, ''))) {
+      return callback(null, true);
+    }
+  }
+
+  // Allow *.onrender.com, *.vercel.app, *.netlify.app, or localhost origins
+  if (
+    origin.endsWith('.onrender.com') ||
+    origin.endsWith('.vercel.app') ||
+    origin.endsWith('.netlify.app') ||
+    origin.includes('localhost') ||
+    origin.includes('127.0.0.1')
+  ) {
+    return callback(null, true);
+  }
+
+  return callback(null, true);
+};
+
 app.use(cors({
   origin: allowedOrigin,
   credentials: true
@@ -96,9 +117,9 @@ const Settings = require('./backend/models/Settings');
 const authMiddleware = require('./backend/middleware/auth');
 const { uploadMiddleware, uploadToCloud, sendNotificationEmail, isCloudinaryMock } = require('./backend/utils/helpers');
 
-// Static folders ing
+// Static folders serving
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-// e static client assets
+// Serve static client assets
 app.use(express.static(__dirname));
 
 /* ==========================================================================
@@ -122,27 +143,35 @@ app.post('/api/auth/login', loginLimiter, async (req, res) => {
       expiresIn: process.env.JWT_EXPIRES_IN || '7d'
     });
 
-    // Set cookie
+    // Set cookie with cross-origin compatibility (SameSite=None, Secure=true)
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
-    res.json({ success: true, message: 'Login successful' });
+    res.json({ success: true, message: 'Login successful', token });
   } catch (error) {
     console.error('[Login Error]', error);
-    res.status(500).json({ success: false, message: 'Internal er Error' });
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 });
 
 app.post('/api/auth/logout', (req, res) => {
-  res.clearCookie('token');
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+  });
   res.json({ success: true, message: 'Logout successful' });
 });
 
 app.get('/api/auth/status', (req, res) => {
-  const token = req.cookies.token;
+  let token = req.cookies ? req.cookies.token : undefined;
+  if (!token && req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+    token = req.headers.authorization.split(' ')[1];
+  }
   if (!token) return res.json({ isAuthenticated: false });
 
   try {
