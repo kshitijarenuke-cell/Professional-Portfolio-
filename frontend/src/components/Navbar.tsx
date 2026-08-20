@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Sun, Moon, Menu, X, ArrowDown } from 'lucide-react';
 import type { SectionId, Theme } from '../types';
 import { soundEngine } from '../utils/audio';
+import { SparkleResumeButton } from './ui/SparkleResumeButton';
 
 interface NavbarProps {
   activeSection: SectionId;
@@ -115,7 +116,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           {/* Solid Vibrant Electric Cyan Resume Button */}
-          <button
+          <SparkleResumeButton
             id="nav-resume-btn"
             onClick={() => {
               soundEngine.playClick();
@@ -129,7 +130,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <span>Resume</span>
             <ArrowDown className="w-3.5 h-3.5" />
-          </button>
+          </SparkleResumeButton>
 
           {/* Mobile Menu Hamburger */}
           <button
@@ -174,7 +175,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               ))}
             </div>
 
-            <button
+            <SparkleResumeButton
               onClick={() => {
                 setMobileMenuOpen(false);
                 if (onOpenResume) onOpenResume();
@@ -183,7 +184,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <span>View &amp; Download Resume</span>
               <ArrowDown className="w-3.5 h-3.5" />
-            </button>
+            </SparkleResumeButton>
           </motion.div>
         )}
       </AnimatePresence>

@@ -99,7 +99,7 @@ export const Hero: React.FC<HeroSectionProps> = ({ onNavigate }) => {
 
           {/* Big Bold Headline: KSHITIJA (White) / RENUKE (Electric Cyan) with Editorial Mask Reveal */}
           <div className="mb-5 sm:mb-6 select-none">
-            <h1 className="font-display font-black text-6xl sm:text-7xl md:text-8xl lg:text-[100px] xl:text-[112px] leading-[0.9] tracking-tight uppercase">
+            <h1 className="font-hero-name font-black text-6xl sm:text-7xl md:text-8xl lg:text-[98px] xl:text-[110px] leading-[0.92] tracking-tight uppercase">
               <span className="block overflow-hidden py-1">
                 <motion.span
                   initial={{ y: '100%', opacity: 0, filter: 'blur(6px)' }}

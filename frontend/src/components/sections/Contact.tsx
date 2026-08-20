@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { api, resolveBackendAssetUrl } from '../../api/client';
 import type { ContactData } from '../../types';
+import { SparkleResumeButton } from '../ui/SparkleResumeButton';
 
 export const Contact: React.FC = () => {
   const { triggerAdminAction, openDashboard, showToast } = useAuth();
@@ -269,20 +270,21 @@ export const Contact: React.FC = () => {
             {/* Resume */}
             <div>
               <div>
-                <a
+                <SparkleResumeButton
+                  as="a"
                   href={resolveBackendAssetUrl(contact?.resumeUrl || '/uploads/Resume.pdf')}
                   download="Resume.pdf"
                   target="_blank"
                   rel="noreferrer"
-                  className="text-xs text-[#00D2FF] hover:text-[#06b6d4] font-medium inline-flex items-center gap-1.5 transition-colors"
+                  className="text-xs text-[#00D2FF] hover:text-[#06b6d4] font-medium inline-flex items-center gap-1.5 transition-colors cursor-pointer"
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3.5 h-3.5">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                     <polyline points="7 10 12 15 17 10" />
                     <line x1="12" y1="15" x2="12" y2="3" />
                   </svg>
-                  Download Latest Resume (PDF)
-                </a>
+                  <span>Download Latest Resume (PDF)</span>
+                </SparkleResumeButton>
               </div>
             </div>
           </div>

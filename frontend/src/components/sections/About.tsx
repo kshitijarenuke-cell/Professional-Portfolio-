@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { api, resolveBackendAssetUrl } from '../../api/client';
 import type { AboutData } from '../../types';
 import { Code2, Brain, Target, GraduationCap, MapPin, Cpu } from 'lucide-react';
+import { SparkleResumeButton } from '../ui/SparkleResumeButton';
 
 const PROFILE_FALLBACK = '/profile.png';
 
@@ -286,14 +287,15 @@ export const About: React.FC = () => {
               viewport={{ once: true, amount: 0.25 }}
               transition={{ duration: 0.5, delay: 0.4 }}
             >
-              <a
+              <SparkleResumeButton
+                as="a"
                 href={resolveBackendAssetUrl(about?.resumeUrl || '/uploads/Resume.pdf')}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-cyan-500/30 bg-cyan-500/5 text-[#00D2FF] hover:bg-[#00D2FF]/5 hover:border-[#00D2FF] hover:shadow-[0_0_15px_rgba(0,210,255,0.25)] transition-all duration-300 text-xs font-bold tracking-wider uppercase font-display select-none"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-cyan-500/30 bg-cyan-500/5 text-[#00D2FF] hover:bg-[#00D2FF]/5 hover:border-[#00D2FF] hover:shadow-[0_0_15px_rgba(0,210,255,0.25)] transition-all duration-300 text-xs font-bold tracking-wider uppercase font-display select-none cursor-pointer"
                 target="_blank"
                 rel="noreferrer"
               >
-                View Resume ↗
-              </a>
+                <span>View Resume ↗</span>
+              </SparkleResumeButton>
             </motion.div>
 
           </div>
