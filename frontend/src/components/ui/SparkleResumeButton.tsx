@@ -53,7 +53,7 @@ const CYAN_PALETTE = [
   '#67E8F9', // Bright Glow Cyan
   '#FFFFFF', // Pure Sparkle White
   '#A5F3FC', // Icy Sparkle
-  '#7DD3FC', // Vivid Sky
+  '#BAE6FD', // Luminous Light Blue
 ];
 
 const DEFAULT_RESUME_PATH = '/resume/Kshitija-Renuke-Resume.pdf';
@@ -85,38 +85,31 @@ export const SparkleResumeButton: React.FC<SparkleResumeButtonProps> = ({
   const burstTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const downloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Generate 24 Dense Hover Sparkles on Mouse Enter (spread on all 4 sides X: -45px to +45px, Y: -35px to +35px)
+  // Hover Effect: 24 continuously twinkling particles spread around all 4 sides
   const handleMouseEnter = () => {
     setIsHovered(true);
     const newHover: HoverParticle[] = [];
-    const count = 24; // 24 continuously twinkling hover particles (range 18–28)
+    const count = 24;
 
     for (let i = 0; i < count; i++) {
-      // Balanced placement covering all 4 sides of the button
-      // Quad 0: Top, Quad 1: Right, Quad 2: Bottom, Quad 3: Left, plus interior
       const side = i % 4;
       let leftPercent = 50;
       let topPercent = 50;
 
       if (side === 0) {
-        // Top edge with outward spread
         leftPercent = 5 + Math.random() * 90;
         topPercent = -15 - Math.random() * 30;
       } else if (side === 1) {
-        // Right edge
         leftPercent = 95 + Math.random() * 35;
         topPercent = 5 + Math.random() * 90;
       } else if (side === 2) {
-        // Bottom edge
         leftPercent = 5 + Math.random() * 90;
         topPercent = 95 + Math.random() * 35;
       } else {
-        // Left edge
         leftPercent = -15 - Math.random() * 30;
         topPercent = 5 + Math.random() * 90;
       }
 
-      // Random micro-offset travel distance (-45px to +45px X, -35px to +35px Y)
       const hx = (Math.random() - 0.5) * 35;
       const hy = (Math.random() - 0.5) * 28;
       const hrot = (Math.random() - 0.5) * 90;
@@ -126,11 +119,10 @@ export const SparkleResumeButton: React.FC<SparkleResumeButtonProps> = ({
       else if (i % 5 === 0) type = 'streak';
 
       const color = CYAN_PALETTE[Math.floor(Math.random() * CYAN_PALETTE.length)];
-      // Size variety: some tiny/dim (2–3px), some medium (4–6px), some prominent (8–10px)
       const size = type === 'star' ? (i % 2 === 0 ? 8 + Math.random() * 3 : 5 + Math.random() * 2) : type === 'dot' ? (i % 2 === 0 ? 2 + Math.random() * 2 : 4 + Math.random() * 2) : 10 + Math.random() * 6;
       
-      const duration = 1.3 + Math.random() * 1.1; // 1.3s - 2.4s
-      const delay = Math.random() * 1.5; // Staggered 0s - 1.5s so particles don't flash in sync
+      const duration = 1.3 + Math.random() * 1.1;
+      const delay = Math.random() * 1.5;
       const opacity = 0.45 + Math.random() * 0.5;
 
       newHover.push({
@@ -156,7 +148,7 @@ export const SparkleResumeButton: React.FC<SparkleResumeButtonProps> = ({
     setHoverParticles([]);
   };
 
-  // Trigger Strong Radial Click Sparkle Burst (44 particles in all 360° directions)
+  // Strong Click Sparkle Explosion: 54 particles spanning 60px–320px in 360°
   const triggerClickSparkleBurst = useCallback(() => {
     if (!buttonRef.current) return;
 
@@ -166,43 +158,59 @@ export const SparkleResumeButton: React.FC<SparkleResumeButtonProps> = ({
     setBurstOrigin({ x: centerX, y: centerY });
 
     const newBurst: BurstParticle[] = [];
-    const count = 44; // 44 rich radial particles (range 35–50)
+    const count = 54; // 54 particles (range 45–60)
 
     for (let i = 0; i < count; i++) {
-      // 360-degree radial distribution in all 8 directions (↖ ↑ ↗ ← BUTTON → ↙ ↓ ↘)
+      // 360° radial distribution across all directions (↖ ↑ ↗ ← BUTTON → ↙ ↓ ↘)
       const baseAngle = (i / count) * 2 * Math.PI;
-      const angle = baseAngle + (Math.random() - 0.5) * 0.32;
+      const angle = baseAngle + (Math.random() - 0.5) * 0.35;
 
-      // Tiered distance: higher density close to button (40-75px), outer trail (80-125px)
-      const isFar = i % 3 === 0;
-      const distance = isFar ? 75 + Math.random() * 48 : 38 + Math.random() * 42;
+      // Tiered distance distribution:
+      // ~30% near (60–100px)
+      // ~40% medium (100–180px)
+      // ~20% far (180–280px)
+      // ~10% special far (280–320px)
+      let distance = 80;
+      const tier = i % 10;
+      if (tier < 3) {
+        distance = 60 + Math.random() * 40; // 60–100px
+      } else if (tier < 7) {
+        distance = 100 + Math.random() * 80; // 100–180px
+      } else if (tier < 9) {
+        distance = 180 + Math.random() * 100; // 180–280px
+      } else {
+        distance = 280 + Math.random() * 40; // 280–320px
+      }
 
       const tx = Math.cos(angle) * distance;
       const ty = Math.sin(angle) * distance;
-      const rot = (Math.random() - 0.5) * 180;
+      const rot = (Math.random() - 0.5) * 240;
       const streakAngle = (angle * 180) / Math.PI;
 
       let type: BurstParticle['type'] = 'dot';
       if (i % 3 === 0) type = 'star';
       else if (i % 6 === 0) type = 'streak';
-      else if (i === 1 || i === 9 || i === 18 || i === 27 || i === 36) type = 'glow';
+      else if (i === 1 || i === 12 || i === 24 || i === 36 || i === 48) type = 'glow';
 
       const color = CYAN_PALETTE[Math.floor(Math.random() * CYAN_PALETTE.length)];
 
-      // Size tiers: Small (2–3px), Medium (4–6px), Occasional prominent sparkle (8–13px)
+      // Size tiers:
+      // Small: 2–3.5px
+      // Medium: 4–6.5px
+      // Occasional prominent sparkle: 8–13px
       let size = 3;
       if (type === 'star') {
-        size = i % 2 === 0 ? 9 + Math.random() * 4 : 5 + Math.random() * 3;
+        size = i % 4 === 0 ? 10 + Math.random() * 3 : i % 2 === 0 ? 6 + Math.random() * 2 : 4 + Math.random() * 2;
       } else if (type === 'dot') {
-        size = i % 2 === 0 ? 2.5 + Math.random() * 1.5 : 4.5 + Math.random() * 2;
+        size = i % 3 === 0 ? 2 + Math.random() * 1.5 : 3.5 + Math.random() * 2;
       } else if (type === 'streak') {
-        size = 16 + Math.random() * 10;
+        size = 14 + Math.random() * 12;
       } else {
-        size = 22 + Math.random() * 10;
+        size = 18 + Math.random() * 8;
       }
 
-      const duration = 0.68 + Math.random() * 0.30; // 680ms - 980ms
-      const delay = Math.random() * 0.055; // 0ms - 55ms
+      const duration = 0.75 + Math.random() * 0.32; // 750ms - 1070ms
+      const delay = Math.random() * 0.06; // 0ms - 60ms
 
       newBurst.push({
         id: Date.now() + i,
@@ -225,7 +233,7 @@ export const SparkleResumeButton: React.FC<SparkleResumeButtonProps> = ({
     burstTimerRef.current = setTimeout(() => {
       setBurstParticles([]);
       setIsPulsing(false);
-    }, 1050);
+    }, 1150);
   }, []);
 
   // Programmatic PDF Download Trigger
@@ -321,7 +329,7 @@ export const SparkleResumeButton: React.FC<SparkleResumeButtonProps> = ({
         </button>
       )}
 
-      {/* Global Viewport Portal for Click Sparkle Burst (NEVER clipped by overflow:hidden) */}
+      {/* Global Viewport Portal attached to document.body (100% immune to navbar or card clipping) */}
       {typeof document !== 'undefined' &&
         burstParticles.length > 0 &&
         createPortal(
@@ -333,7 +341,7 @@ export const SparkleResumeButton: React.FC<SparkleResumeButtonProps> = ({
               width: 0,
               height: 0,
               pointerEvents: 'none',
-              zIndex: 999999,
+              zIndex: 9999999,
               overflow: 'visible',
             }}
             aria-hidden="true"
@@ -345,13 +353,13 @@ export const SparkleResumeButton: React.FC<SparkleResumeButtonProps> = ({
                 top: 0,
                 width: p.size,
                 height: p.size,
-                ['--tx' as any]: `${p.tx}px`,
-                ['--ty' as any]: `${p.ty}px`,
-                ['--rot' as any]: `${p.rot}deg`,
-                ['--angle' as any]: `${p.angle}deg`,
-                animationDuration: `${p.duration}s`,
-                animationDelay: `${p.delay}s`,
-                animationTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                ['--tx' as any]: `${p.tx.toFixed(1)}px`,
+                ['--ty' as any]: `${p.ty.toFixed(1)}px`,
+                ['--rot' as any]: `${p.rot.toFixed(1)}deg`,
+                ['--angle' as any]: `${p.angle.toFixed(1)}deg`,
+                animationDuration: `${p.duration.toFixed(2)}s`,
+                animationDelay: `${p.delay.toFixed(3)}s`,
+                animationTimingFunction: 'cubic-bezier(0.1, 0.85, 0.25, 1)',
                 animationFillMode: 'forwards',
               };
 
@@ -371,7 +379,7 @@ export const SparkleResumeButton: React.FC<SparkleResumeButtonProps> = ({
                       style={{
                         width: '100%',
                         height: '100%',
-                        filter: `drop-shadow(0 0 8px ${p.color}) drop-shadow(0 0 14px ${p.color})`,
+                        filter: `drop-shadow(0 0 6px ${p.color}) drop-shadow(0 0 12px ${p.color})`,
                       }}
                     >
                       <path d="M12 0L14.2 9.8L24 12L14.2 14.2L12 24L9.8 14.2L0 12L9.8 9.8Z" />
@@ -387,10 +395,10 @@ export const SparkleResumeButton: React.FC<SparkleResumeButtonProps> = ({
                     className="sparkle-particle"
                     style={{
                       ...particleStyle,
-                      height: '2.5px',
+                      height: '2px',
                       width: `${p.size}px`,
                       background: `linear-gradient(90deg, transparent, ${p.color}, #FFFFFF, transparent)`,
-                      boxShadow: `0 0 10px ${p.color}, 0 0 16px ${p.color}`,
+                      boxShadow: `0 0 8px ${p.color}, 0 0 14px ${p.color}`,
                       borderRadius: '2px',
                       animationName: 'sparkleStreakAnim',
                     }}
@@ -406,8 +414,8 @@ export const SparkleResumeButton: React.FC<SparkleResumeButtonProps> = ({
                     style={{
                       ...particleStyle,
                       borderRadius: '50%',
-                      background: `radial-gradient(circle, ${p.color} 0%, rgba(0,210,255,0.4) 50%, rgba(0,210,255,0) 70%)`,
-                      filter: 'blur(3px)',
+                      background: `radial-gradient(circle, ${p.color} 0%, rgba(0,210,255,0.35) 50%, rgba(0,210,255,0) 70%)`,
+                      filter: 'blur(2.5px)',
                       animationName: 'sparkleGlowOrbAnim',
                     }}
                   />
@@ -422,7 +430,7 @@ export const SparkleResumeButton: React.FC<SparkleResumeButtonProps> = ({
                     ...particleStyle,
                     borderRadius: '50%',
                     backgroundColor: p.color,
-                    boxShadow: `0 0 8px 2px ${p.color}, 0 0 16px 4px ${p.color}`,
+                    boxShadow: `0 0 6px 1.5px ${p.color}, 0 0 12px 3px ${p.color}`,
                     animationName: 'sparkleDotAnim',
                   }}
                 />
