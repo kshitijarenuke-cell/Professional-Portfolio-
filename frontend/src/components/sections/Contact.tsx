@@ -272,10 +272,10 @@ export const Contact: React.FC = () => {
               <div>
                 <SparkleResumeButton
                   as="a"
-                  href={resolveBackendAssetUrl(contact?.resumeUrl || '/uploads/Resume.pdf')}
-                  download="Resume.pdf"
-                  target="_blank"
-                  rel="noreferrer"
+                  pdfUrl={resolveBackendAssetUrl(contact?.resumeUrl || '/resume/Kshitija-Renuke-Resume.pdf')}
+                  pdfFileName="Kshitija-Renuke-Resume.pdf"
+                  href={resolveBackendAssetUrl(contact?.resumeUrl || '/resume/Kshitija-Renuke-Resume.pdf')}
+                  download="Kshitija-Renuke-Resume.pdf"
                   className="text-xs text-[#00D2FF] hover:text-[#06b6d4] font-medium inline-flex items-center gap-1.5 transition-colors cursor-pointer"
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3.5 h-3.5">

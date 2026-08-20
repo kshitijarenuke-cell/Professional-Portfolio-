@@ -118,13 +118,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Solid Vibrant Electric Cyan Resume Button */}
           <SparkleResumeButton
             id="nav-resume-btn"
+            pdfUrl="/resume/Kshitija-Renuke-Resume.pdf"
+            pdfFileName="Kshitija-Renuke-Resume.pdf"
             onClick={() => {
               soundEngine.playClick();
-              if (onOpenResume) {
-                onOpenResume();
-              } else {
-                handleNavClick('contact');
-              }
+              if (onOpenResume) onOpenResume();
             }}
             className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-[#080A0C] bg-[#00D2FF] hover:bg-[#38BDF8] shadow-[0_2px_14px_rgba(0,210,255,0.35)] hover:shadow-[0_4px_20px_rgba(0,210,255,0.55)] transition-all duration-200 cursor-pointer border-none"
           >
@@ -176,9 +174,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
 
             <SparkleResumeButton
+              pdfUrl="/resume/Kshitija-Renuke-Resume.pdf"
+              pdfFileName="Kshitija-Renuke-Resume.pdf"
               onClick={() => {
                 setMobileMenuOpen(false);
-                if (onOpenResume) onOpenResume();
               }}
               className="w-full mt-2 py-3 rounded-xl bg-[#00D2FF] hover:bg-[#38BDF8] text-[#080A0C] font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-lg shadow-[#00D2FF]/25 border-none"
             >
