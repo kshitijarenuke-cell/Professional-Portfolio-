@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { api, uploadFile, resolveBackendAssetUrl } from '../../api/client';
 import type { Project } from '../../types';
@@ -13,6 +13,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onD
   const { triggerAdminAction, showToast } = useAuth();
   // MongoDB returns _id; fall back gracefully so we never hit /api/projects/undefined
   const projectId = project._id || project.id;
+  const cardRef = useRef<HTMLDivElement | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -28,7 +29,40 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onD
   const [imagePreview, setImagePreview] = useState(project.imageUrl || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleEditClick = () => {
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (isEditing) return;
+    const card = cardRef.current;
+    if (!card) return;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    // Controlled subtle 3D tilt: max ±4.5 degrees
+    const rotateX = -((y - centerY) / centerY) * 4.5;
+    const rotateY = ((x - centerX) / centerX) * 4.5;
+
+    card.style.setProperty('--rot-x', `${rotateX.toFixed(2)}deg`);
+    card.style.setProperty('--rot-y', `${rotateY.toFixed(2)}deg`);
+    card.style.setProperty('--mouse-x', `${x.toFixed(1)}px`);
+    card.style.setProperty('--mouse-y', `${y.toFixed(1)}px`);
+    card.style.setProperty('--lift-y', `-5px`);
+    card.style.setProperty('--glow-opacity', '1');
+  };
+
+  const handleMouseLeave = () => {
+    const card = cardRef.current;
+    if (!card) return;
+    card.style.setProperty('--rot-x', '0deg');
+    card.style.setProperty('--rot-y', '0deg');
+    card.style.setProperty('--lift-y', '0px');
+    card.style.setProperty('--glow-opacity', '0');
+  };
+
+  const handleEditClick = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    handleMouseLeave();
     triggerAdminAction(() => {
       setTitle(project.title);
       setDescription(project.description);
@@ -43,7 +77,9 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onD
     });
   };
 
-  const handleDeleteClick = () => {
+  const handleDeleteClick = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    handleMouseLeave();
     triggerAdminAction(() => {
       setIsDeleting(true);
     });
@@ -153,7 +189,16 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onD
   };
 
   return (
-    <div className={`sp-card ${isEditing ? 'editing' : ''}`} data-id={projectId}>
+    <div
+      ref={cardRef}
+      className={`sp-card ${isEditing ? 'editing' : ''}`}
+      data-id={projectId}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
+      {/* Subtle cursor-following cyan glow behind content */}
+      <div className="sp-card-glow" />
+
       {/* Single Project Image Area */}
       <div className="sp-card-img-wrap relative group/img">
         {(isEditing ? imagePreview : project.imageUrl) ? (
@@ -205,13 +250,13 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onUpdate, onD
       {/* Admin Action Hover Buttons */}
       {!isEditing && (
         <div className="sp-card-actions">
-          <button className="sp-action-btn edit-btn" type="button" title="Edit Project" onClick={handleEditClick}>
+          <button className="sp-action-btn edit-btn" type="button" title="Edit Project" onClick={(e) => handleEditClick(e)}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
             </svg>
           </button>
-          <button className="sp-action-btn del delete-btn" type="button" title="Delete Project" onClick={handleDeleteClick}>
+          <button className="sp-action-btn del delete-btn" type="button" title="Delete Project" onClick={(e) => handleDeleteClick(e)}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="3 6 5 6 21 6" />
               <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />

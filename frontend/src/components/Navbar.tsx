@@ -50,8 +50,8 @@ export const Navbar: React.FC<NavbarProps> = ({
         />
       </div>
 
-      {/* Main Navigation Bar (Pixel-matched to reference image) */}
-      <header className="fixed top-0 left-0 right-0 z-40 px-6 sm:px-12 md:px-16 lg:px-20 py-6 flex items-center justify-between backdrop-blur-md bg-[#060709]/40 transition-colors duration-300">
+      {/* Main Floating Rounded Navigation Bar Capsule */}
+      <header className={`floating-navbar-container ${scrollPercent > 2 ? 'scrolled' : ''} px-6 sm:px-8 md:px-10 lg:px-12 py-3.5 sm:py-4 flex items-center justify-between`}>
         {/* Left: Brand Monogram KR. */}
         <button
           id="nav-brand-logo"
