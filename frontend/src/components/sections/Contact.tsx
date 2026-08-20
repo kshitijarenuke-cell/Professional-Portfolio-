@@ -205,7 +205,7 @@ export const Contact: React.FC = () => {
                   <span className="text-xs font-medium">GitHub</span>
                 </div>
                 <span className="text-xs text-[#00D2FF] group-hover:translate-x-1 transition-transform">
-                  github.com/kshitijarenuke &rarr;
+                  github.com/kshitijarenuke-cell &rarr;
                 </span>
               </a>
 
@@ -220,7 +220,7 @@ export const Contact: React.FC = () => {
                   <span className="text-xs font-medium">LinkedIn</span>
                 </div>
                 <span className="text-xs text-[#00D2FF] group-hover:translate-x-1 transition-transform">
-                  linkedin.com/in/kshitijarenuke &rarr;
+                  linkedin.com/in/kshitija-renuke &rarr;
                 </span>
               </a>
 
